@@ -30,7 +30,7 @@ class InvoiceConfig:
     
     # File paths
     INVOICE_DATA_FILE = "data/invoices.csv"
-    INVOICE_PDF_DIR = "pdfs/invoices"
+    INVOICE_PDF_DIR = "data/invoices"
     
     # Invoice Headers/Labels (Static)
     HEADERS = {

@@ -39,7 +39,7 @@ class InvoiceApp:
                     'tenant_name': ''
                 },
                 invoice={
-                    'invoice_date': datetime.now().strftime('%Y-%m-%d'),
+                    'invoice_date': datetime.now().strftime('%d/%m/%Y'),
                     'property_name': '',
                     'rental_price': 0.0,
                     'commission_rate': 0.0,
@@ -86,7 +86,7 @@ class InvoiceApp:
         })
     
         self.state.invoice.update({
-            'invoice_date': now.strftime('%Y-%m-%d'),
+            'invoice_date': now.strftime('%d/%m/%Y'),
             'property_name': kwargs.get('property_name', ''),
             'rental_price': kwargs.get('rental_price', 0.0),
             'commission_rate': kwargs.get('commission_rate', 0.0),
@@ -255,9 +255,36 @@ class InvoiceApp:
             # Invoice Date and Payment Due Date row
             col1, col2 = st.columns([0.5, 0.5])
             with col1:
-                invoice_date = st.date_input("Invoice Date", 
-                    value=datetime.now(),
-                    key='invoice_date')
+                try:
+                    # If there's a stored date, use it; otherwise use current date
+                    if self.state.invoice['invoice_date']:
+                        current_date = datetime.strptime(self.state.invoice['invoice_date'], '%d/%m/%Y')
+                        print("\n\nDebugging: Stored date found:", self.state.invoice['invoice_date'])
+                    else:
+                        current_date = datetime.now()
+                        print("\n\nDebugging: Using current date:", current_date)
+
+                    # Format the date for display
+                    formatted_date = current_date.strftime('%Y-%m-%d')  # Format required by st.date_input
+                    display_date = datetime.strptime(formatted_date, '%Y-%m-%d')
+        
+                    invoice_date = st.date_input(
+                            "Invoice Date", 
+                            value=display_date,
+                            key='invoice_date'
+                    )
+        
+                    # Convert the selected date back to dd/mm/yyyy format for storage
+                    selected_date = invoice_date.strftime('%d/%m/%Y')
+                    print("\n\nDebugging: Selected date:", selected_date)
+        
+                except ValueError as e:
+                    print("\n\nDebugging: Date conversion error:", str(e))
+                    invoice_date = st.date_input(
+                            "Invoice Date", 
+                            value=datetime.now(),
+                            key='invoice_date'
+                    )
             with col2:
                 # Payment due date is automatically set to invoice date + 30 days
                 payment_due_date = st.date_input("Payment Due Date",
@@ -314,11 +341,12 @@ class InvoiceApp:
                     step=1000.0)
             with col3:
                 tax_amount = st.number_input("VAT Amount (5%)", 
-                    value=commission_rate * 0.05 if commission_rate > 0 else 0.0,
+                    value=rental_price * commission_rate * 0.05 if commission_rate > 0 else 0.0,
                     disabled=True)
                 
             # Total Amount (Calculated)
-            total_amount = commission_rate + tax_amount
+            rate = rental_price * commission_rate
+            total_amount = rate + tax_amount
             st.text_input("Total Amount (AED)", 
                 value=f"{total_amount:,.2f}",
                 disabled=True)
@@ -344,7 +372,7 @@ class InvoiceApp:
                             commission_rate=commission_rate,
                             tax_amount=tax_amount,
                             total_amount=total_amount,
-                            invoice_date=invoice_date.strftime('%Y-%m-%d')
+                            invoice_date=invoice_date.strftime('%d/%m/%Y')
                         )
                     except ValueError as e:
                         st.error(f"Invalid input: {str(e)}")
