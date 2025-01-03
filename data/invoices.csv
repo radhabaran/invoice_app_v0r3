@@ -1,0 +1,2 @@
+invoice_number,bill_to_party_name,bill_to_party_email,bill_to_party_address_1,bill_to_party_address_2,bill_to_party_trn,tenant_name,invoice_date,property_name,rental_price,commission_rate,tax_amount,total_amount,status,payment_date,terms,vat_rate,created_at,updated_at
+VREB0001,Realcon Real Estate,radhabaran.mohanty@gmail.com,"Jay Tower, Sanat Drive","Dubai, U.A.E",123456789012345,Rajesh Kumar,03/01/2025,Zen Villa,860000.0,0.04,1720.0,36120.0,Pending,,Due on Receipt,0.05,2025-01-03 19:01:32,2025-01-03 19:01:32
